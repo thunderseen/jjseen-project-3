@@ -80,6 +80,45 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     col2Img: '',
     tags: ['Web App', 'Render', 'Live Deployment'],
   },
+  {
+    id: 'apex-architecture-demo',
+    category: 'Concept • GitHub Pages Demo',
+    name: 'Apex Architecture & Build',
+    description:
+      'A business website concept for an architecture and construction brand, published as an interactive GitHub Pages demo.',
+    href: 'https://thunderseen.github.io/jjs-project-2/demos/apex-agency.html',
+    useLivePreview: true,
+    col1Img1: '',
+    col1Img2: '',
+    col2Img: '',
+    tags: ['Business Website', 'Website Concept', 'GitHub Pages'],
+  },
+  {
+    id: 'velora-storefront-demo',
+    category: 'Concept • GitHub Pages Demo',
+    name: 'Velora Roasters',
+    description:
+      'A coffee storefront concept with a conversion-focused shopping experience, published as a GitHub Pages demo.',
+    href: 'https://thunderseen.github.io/jjs-project-2/demos/velora-store.html',
+    useLivePreview: true,
+    col1Img1: '',
+    col1Img2: '',
+    col2Img: '',
+    tags: ['Storefront', 'Website Concept', 'GitHub Pages'],
+  },
+  {
+    id: 'pulserank-seo-demo',
+    category: 'Concept • GitHub Pages Demo',
+    name: 'PulseRank AI',
+    description:
+      'An SEO audit and lead-generation showcase for keyword discovery and prospect intelligence.',
+    href: 'https://thunderseen.github.io/jjs-project-2/demos/pulse-ai-seo.html',
+    useLivePreview: true,
+    col1Img1: '',
+    col1Img2: '',
+    col2Img: '',
+    tags: ['SEO', 'Lead Generation', 'GitHub Pages'],
+  },
 ];
 
 export const DEFAULT_STORE: PortfolioStore = {

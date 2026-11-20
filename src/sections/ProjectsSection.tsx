@@ -5,6 +5,18 @@ import { FadeIn } from '../components/FadeIn';
 import { LiveProjectButton } from '../components/LiveProjectButton';
 import { ProjectItem, normalizeUrl } from '../types/portfolio';
 
+function getPreviewSandbox(url: string): string {
+  try {
+    if (new URL(url, window.location.href).origin === window.location.origin) {
+      return 'allow-scripts allow-forms allow-popups';
+    }
+  } catch {
+    return 'allow-scripts allow-forms allow-popups';
+  }
+
+  return 'allow-scripts allow-same-origin allow-forms allow-popups';
+}
+
 interface StickyCardProps {
   project: ProjectItem;
   index: number;
@@ -27,6 +39,7 @@ const StickyProjectCard: React.FC<StickyCardProps> = ({
 
   const displayNumber = String(index + 1).padStart(2, '0');
   const liveUrl = normalizeUrl(project.href);
+  const previewSandbox = getPreviewSandbox(liveUrl);
   const customImages = [project.col1Img1, project.col1Img2, project.col2Img].filter(Boolean);
   const showLiveEmbed = Boolean(liveUrl) && (project.useLivePreview || customImages.length === 0);
 
@@ -144,7 +157,7 @@ const StickyProjectCard: React.FC<StickyCardProps> = ({
                 loading="lazy"
                 onLoad={() => setIframeLoaded(true)}
                 className="h-full w-full border-0 bg-white"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                sandbox={previewSandbox}
               />
             </div>
           </div>
