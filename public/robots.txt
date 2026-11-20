@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://thunderseen.github.io/jjseen-project-3/sitemap.xml
