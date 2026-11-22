@@ -321,7 +321,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="no-print fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-6 overflow-y-auto"
+          className="no-print fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md p-3 sm:p-6 overflow-y-auto"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 18 }}

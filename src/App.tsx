@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { HeroSection } from './sections/HeroSection';
 import { MarqueeSection } from './sections/MarqueeSection';
 import { AboutSection } from './sections/AboutSection';
@@ -14,6 +15,12 @@ export function App() {
   const [contactOpen, setContactOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const [store, setStore] = useState<PortfolioStore>(() => loadStore());
+  const { scrollYProgress } = useScroll();
+  const scrollScaleX = useSpring(scrollYProgress, {
+    stiffness: 140,
+    damping: 28,
+    restDelta: 0.001,
+  });
 
   const handleUpdateStore = (next: PortfolioStore) => {
     setStore(next);
@@ -22,8 +29,6 @@ export function App() {
 
   // Private Admin Panel triggers: #admin, ?admin=1, or Ctrl+Shift+A
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
-
     const checkRoute = () => {
       if (
         window.location.hash === '#admin' ||
@@ -49,7 +54,7 @@ export function App() {
 
   const closeAdmin = () => {
     setAdminOpen(false);
-    if (import.meta.env.DEV && window.location.hash === '#admin') {
+    if (window.location.hash === '#admin') {
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   };
@@ -59,12 +64,18 @@ export function App() {
       className="min-h-screen w-full bg-[#0C0C0C] text-[#D7E2EA]"
       style={{ overflowX: 'clip' }}
     >
+      {/* Ultra-smooth spring-damped reading progress hairline */}
+      <motion.div
+        aria-hidden="true"
+        style={{ scaleX: scrollScaleX }}
+        className="no-print pointer-events-none fixed left-0 right-0 top-0 z-50 h-[2px] origin-left bg-gradient-to-r from-[#5B5FE8] via-[#8B7CFF] to-[#67C5FF]"
+      />
       <CursorCompanion />
       <a className="skip-link" href="#about">
         Skip to content
       </a>
       <HeroSection onOpenContact={() => setContactOpen(true)} />
-      <MarqueeSection items={store.showcaseItems} />
+      <MarqueeSection items={store.showcaseItems} projects={store.projects} />
       <AboutSection onOpenContact={() => setContactOpen(true)} />
       <ServicesSection />
       <ProjectsSection projects={store.projects} />
@@ -72,16 +83,15 @@ export function App() {
         cvPdfDataUrl={store.cvPdfDataUrl}
         cvPdfName={store.cvPdfName}
         onOpenContact={() => setContactOpen(true)}
+        onOpenAdmin={() => setAdminOpen(true)}
       />
       <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
-      {import.meta.env.DEV && (
-        <AdminPanel
-          open={adminOpen}
-          onClose={closeAdmin}
-          store={store}
-          onUpdateStore={handleUpdateStore}
-        />
-      )}
+      <AdminPanel
+        open={adminOpen}
+        onClose={closeAdmin}
+        store={store}
+        onUpdateStore={handleUpdateStore}
+      />
     </main>
   );
 }

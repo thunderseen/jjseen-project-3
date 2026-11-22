@@ -8,21 +8,21 @@ interface AboutSectionProps {
 }
 
 const ABOUT_TEXT =
-  "With more than five years of experience in digital marketing, brand communication, and WordPress development, i focus on Elementor, WooCommerce, SEO, and AI-assisted workflows that help businesses stand out and convert. Let's build something incredible together!";
+  "With more than five years of experience in digital marketing, brand communication, and WordPress development, I focus on Elementor, WooCommerce, SEO, and AI-assisted workflows that help businesses stand out and convert. Let's build something incredible together!";
 
 export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => {
   return (
     <section
       id="about"
-      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#0C0C0C] px-5 sm:px-8 md:px-10 py-20"
+      className="relative flex min-h-[78vh] w-full flex-col items-center justify-center overflow-hidden bg-[#0C0C0C] px-5 sm:px-8 md:px-10 py-16 md:py-24"
     >
       {/* Top-left decorative 3D Moon */}
       <FadeIn
         delay={0.1}
-        x={-80}
+        x={-60}
         y={0}
-        duration={0.9}
-        className="pointer-events-none absolute top-[4%] left-[1%] sm:left-[2%] md:left-[4%] w-[120px] sm:w-[160px] md:w-[210px] select-none"
+        duration={0.85}
+        className="pointer-events-none absolute top-[6%] left-[2%] sm:left-[4%] md:left-[6%] w-[82px] sm:w-[110px] md:w-[142px] select-none opacity-90"
       >
         <img
           src={`${import.meta.env.BASE_URL}moon-icon.png`}
@@ -37,10 +37,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
       {/* Bottom-left decorative 3D object */}
       <FadeIn
         delay={0.25}
-        x={-80}
+        x={-60}
         y={0}
-        duration={0.9}
-        className="pointer-events-none absolute bottom-[8%] left-[3%] sm:left-[6%] md:left-[10%] w-[100px] sm:w-[140px] md:w-[180px] select-none"
+        duration={0.85}
+        className="pointer-events-none absolute bottom-[8%] left-[4%] sm:left-[7%] md:left-[11%] w-[72px] sm:w-[96px] md:w-[126px] select-none opacity-90"
       >
         <img
           src={`${import.meta.env.BASE_URL}about-object.png`}
@@ -55,10 +55,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
       {/* Top-right decorative 3D Lego */}
       <FadeIn
         delay={0.15}
-        x={80}
+        x={60}
         y={0}
-        duration={0.9}
-        className="pointer-events-none absolute top-[4%] right-[1%] sm:right-[2%] md:right-[4%] w-[120px] sm:w-[160px] md:w-[210px] select-none"
+        duration={0.85}
+        className="pointer-events-none absolute top-[6%] right-[2%] sm:right-[4%] md:right-[6%] w-[82px] sm:w-[110px] md:w-[142px] select-none opacity-90"
       >
         <img
           src={`${import.meta.env.BASE_URL}lego-icon.png`}
@@ -73,10 +73,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
       {/* Bottom-right decorative 3D group */}
       <FadeIn
         delay={0.3}
-        x={80}
+        x={60}
         y={0}
-        duration={0.9}
-        className="pointer-events-none absolute bottom-[8%] right-[3%] sm:right-[6%] md:right-[10%] w-[130px] sm:w-[170px] md:w-[220px] select-none"
+        duration={0.85}
+        className="pointer-events-none absolute bottom-[8%] right-[4%] sm:right-[7%] md:right-[11%] w-[88px] sm:w-[116px] md:w-[148px] select-none opacity-90"
       >
         <img
           src={`${import.meta.env.BASE_URL}about-group.png`}
@@ -89,12 +89,12 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
       </FadeIn>
 
       {/* Center Content */}
-      <div className="relative z-10 flex flex-col items-center gap-16 sm:gap-20 md:gap-24">
-        <div className="flex flex-col items-center gap-10 sm:gap-14 md:gap-16">
-          <FadeIn delay={0} y={40}>
+      <div className="relative z-10 flex flex-col items-center gap-10 sm:gap-12 md:gap-14">
+        <div className="flex flex-col items-center gap-6 sm:gap-8 md:gap-10">
+          <FadeIn delay={0} y={32}>
             <h2
               className="hero-heading text-center font-black uppercase leading-none tracking-tight"
-              style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
+              style={{ fontSize: 'clamp(2.4rem, 7vw, 96px)' }}
             >
               About me
             </h2>
@@ -102,12 +102,12 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
 
           <AnimatedText
             text={ABOUT_TEXT}
-            className="max-w-[560px] text-center font-medium leading-relaxed text-[#D7E2EA]"
-            style={{ fontSize: 'clamp(1rem, 2vw, 1.35rem)' }}
+            className="max-w-[540px] text-center font-medium leading-relaxed text-[#D7E2EA]"
+            style={{ fontSize: 'clamp(0.95rem, 1.45vw, 1.2rem)' }}
           />
         </div>
 
-        <FadeIn delay={0.15} y={24}>
+        <FadeIn delay={0.15} y={20}>
           <ContactButton onClick={onOpenContact} />
         </FadeIn>
       </div>

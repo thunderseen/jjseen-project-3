@@ -57,28 +57,29 @@
 .hero-portrait-wrap {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 52%;
   transform: translate(-50%, -50%);
   z-index: 10;
-  width: min(88vw, 400px);
+  width: min(72vw, 300px);
   touch-action: pan-y;
 }
 
 @media (min-width: 640px) {
   .hero-portrait-wrap {
-    width: min(78vw, 500px);
+    top: 51%;
+    width: min(58vw, 370px);
   }
 }
 
 @media (min-width: 768px) {
   .hero-portrait-wrap {
-    width: min(78vw, 600px);
+    width: min(50vw, 420px);
   }
 }
 
 @media (min-width: 1024px) {
   .hero-portrait-wrap {
-    width: min(78vh, 46vw);
+    width: clamp(360px, 58vh, 470px);
   }
 }
 
@@ -174,25 +175,25 @@
   );
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Clean ATS PDF printing for CV sheet */
 @media print {
   body * {
     visibility: hidden;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      scroll-behavior: auto !important;
-      transition-duration: 0.01ms !important;
-    }
   }
   .cv-print-overlay,
   .cv-print-sheet,

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText,
@@ -26,6 +27,7 @@ interface CvSectionProps {
   cvPdfDataUrl: string | null;
   cvPdfName: string | null;
   onOpenContact: () => void;
+  onOpenAdmin?: () => void;
 }
 
 const SKILL_GROUPS = [
@@ -80,6 +82,7 @@ export const CvSection: React.FC<CvSectionProps> = ({
   cvPdfDataUrl,
   cvPdfName,
   onOpenContact,
+  onOpenAdmin,
 }) => {
   const [activeTab, setActiveTab] = useState<CvTab>('experience');
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -99,47 +102,47 @@ export const CvSection: React.FC<CvSectionProps> = ({
   return (
     <section
       id="cv"
-      className="relative z-10 w-full bg-[#0C0C0C] px-4 sm:px-8 md:px-10 pt-10 pb-20 text-[#D7E2EA]"
+      className="relative z-10 w-full bg-[#0C0C0C] px-4 sm:px-8 md:px-10 pt-6 pb-14 text-[#D7E2EA]"
     >
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-5xl">
         {/* Dedicated Interactive CV Box */}
-        <FadeIn delay={0.05} y={32}>
-          <div className="overflow-hidden rounded-[36px] sm:rounded-[48px] border border-[#D7E2EA]/20 bg-gradient-to-br from-[#14161F] via-[#101118] to-[#0C0C0C] p-6 sm:p-8 md:p-10 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
+        <FadeIn delay={0.05} y={24}>
+          <div className="overflow-hidden rounded-[26px] sm:rounded-[34px] border border-[#D7E2EA]/18 bg-gradient-to-br from-[#14161F] via-[#101118] to-[#0C0C0C] p-5 sm:p-7 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.55)]">
             {/* Header Strip */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-[#D7E2EA]/12 pb-7">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 border-b border-[#D7E2EA]/12 pb-5">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#8B7CFF]/35 bg-[#8B7CFF]/10 px-3.5 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-[#C4B5FD]">
-                  <FileText className="h-3.5 w-3.5" />
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#8B7CFF]/35 bg-[#8B7CFF]/10 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.2em] text-[#C4B5FD]">
+                  <FileText className="h-3 w-3" />
                   Curriculum Vitae
                 </div>
-                <h2 className="hero-heading mt-3 text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight leading-none">
+                <h2 className="hero-heading mt-2.5 text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight leading-none">
                   Jayed Jaman Seen
                 </h2>
-                <p className="mt-2 text-sm sm:text-base font-light text-[#D7E2EA]/75">
+                <p className="mt-1.5 text-xs sm:text-sm font-light text-[#D7E2EA]/75">
                   WordPress Web Development &amp; AI Tools Specialist • Barishal, Bangladesh
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => setPreviewOpen(true)}
-                  className="inline-flex items-center gap-2 rounded-full border-2 border-[#D7E2EA]/50 px-5 py-3 text-xs sm:text-sm font-medium uppercase tracking-widest text-[#D7E2EA] hover:bg-[#D7E2EA]/10 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#D7E2EA]/50 px-4 py-2.5 text-xs font-medium uppercase tracking-widest text-[#D7E2EA] hover:bg-[#D7E2EA]/10 transition-colors"
                 >
-                  <Eye className="h-4 w-4" />
+                  <Eye className="h-3.5 w-3.5" />
                   View Full CV
                 </button>
                 <button
                   type="button"
                   onClick={handleDownloadCv}
-                  className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-xs sm:text-sm font-medium uppercase tracking-widest text-white transition-all hover:brightness-110 active:scale-[0.98]"
+                  className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-medium uppercase tracking-widest text-white transition-all hover:brightness-110 active:scale-[0.98]"
                   style={{
                     background:
                       'linear-gradient(123deg, #5B5FE8 0%, #8B7CFF 48%, #67C5FF 100%)',
                     boxShadow: '0 6px 20px rgba(139, 124, 255, 0.3)',
                   }}
                 >
-                  <Download className="h-4 w-4" />
+                  <Download className="h-3.5 w-3.5" />
                   {cvPdfDataUrl ? 'Download PDF CV' : 'Save / Print PDF'}
                 </button>
               </div>
@@ -516,23 +519,30 @@ export const CvSection: React.FC<CvSectionProps> = ({
             <span>
               B.Sc. CSE (Trust University) • BCC AI Certified • DYD 600h ICT (8th Batch CR) • IELTS 6.5
             </span>
-            <span>
+            <span
+              onClick={(e) => {
+                if (e.detail >= 3) onOpenAdmin?.();
+              }}
+              className="select-none cursor-default"
+            >
               &copy; {new Date().getFullYear()} Jayed Jaman Seen
             </span>
           </div>
         </footer>
       </div>
 
-      {/* Full Printable / ATS CV Preview Modal */}
-      <AnimatePresence>
-        {previewOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setPreviewOpen(false)}
-            className="cv-print-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-6 overflow-y-auto"
-          >
+      {/* Full Printable / ATS CV Preview Modal rendered in body portal so nothing overlaps it */}
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {previewOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setPreviewOpen(false)}
+                className="cv-print-overlay fixed inset-0 z-[60] flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-6 overflow-y-auto"
+              >
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -637,7 +647,9 @@ export const CvSection: React.FC<CvSectionProps> = ({
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+          document.body
+        )}
     </section>
   );
 };

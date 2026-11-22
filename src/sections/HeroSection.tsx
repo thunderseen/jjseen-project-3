@@ -25,9 +25,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact }) => {
           aria-label="Main navigation"
           delay={0}
           y={-20}
-          className="w-full px-6 pt-6 md:px-10 md:pt-8"
+          className="mx-auto w-full max-w-6xl px-6 pt-5 md:px-10 md:pt-7"
         >
-          <div className="flex w-full items-center justify-between text-[#D7E2EA] font-medium uppercase tracking-wider text-sm md:text-lg lg:text-[1.4rem]">
+          <div className="flex w-full items-center justify-between text-[#D7E2EA] font-medium uppercase tracking-widest text-xs sm:text-sm md:text-[15px]">
             <a
               href="#about"
               className="transition-opacity duration-200 hover:opacity-70"
@@ -49,20 +49,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact }) => {
             <button
               type="button"
               onClick={onOpenContact}
-              className="uppercase tracking-wider transition-opacity duration-200 hover:opacity-70"
+              className="uppercase tracking-widest transition-opacity duration-200 hover:opacity-70"
             >
               Contact
             </button>
           </div>
         </FadeIn>
 
-        <div className="w-full overflow-hidden px-2 sm:px-4">
-          <FadeIn as="div" delay={0.15} y={40}>
+        <div className="w-full overflow-hidden px-4 sm:px-6">
+          <FadeIn as="div" delay={0.15} y={32}>
             <h1
               id="hero-heading"
-              className="hero-heading mt-6 w-full select-none whitespace-nowrap text-center text-[13vw] font-black uppercase leading-none tracking-tight sm:mt-4 sm:text-[14vw] md:-mt-5 md:text-[15vw] lg:text-[16.2vw]"
+              className="hero-heading mt-8 sm:mt-6 md:mt-5 w-full select-none whitespace-nowrap text-center text-[clamp(2.65rem,9.8vw,8.25rem)] font-black leading-none tracking-tight"
             >
-              Hi, I&rsquo;m Jayed
+              Hi, I&rsquo;m <span className="uppercase">JAYED</span>
             </h1>
           </FadeIn>
         </div>
@@ -72,11 +72,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact }) => {
       <LivingPortrait />
 
       {/* Bottom Bar */}
-      <div className="relative z-20 flex w-full items-end justify-between px-6 md:px-10 pb-7 sm:pb-8 md:pb-10">
+      <div className="relative z-20 mx-auto flex w-full max-w-6xl flex-col items-start gap-4 px-6 pb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-0 sm:pb-8 md:px-10 md:pb-9">
         <FadeIn delay={0.35} y={20}>
           <p
-            className="max-w-[160px] sm:max-w-[220px] md:max-w-[270px] font-light uppercase leading-snug tracking-wide text-[#D7E2EA]"
-            style={{ fontSize: 'clamp(0.75rem, 1.4vw, 1.5rem)' }}
+            className="max-w-[200px] sm:max-w-[240px] md:max-w-[270px] font-light uppercase leading-snug tracking-wide text-[#D7E2EA]/90"
+            style={{ fontSize: 'clamp(0.72rem, 1.05vw, 0.98rem)' }}
           >
             a wordpress developer &amp; ai specialist crafting striking digital
             experiences

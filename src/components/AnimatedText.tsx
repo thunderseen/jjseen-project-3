@@ -8,11 +8,11 @@ interface AnimatedCharProps {
 }
 
 const AnimatedChar: React.FC<AnimatedCharProps> = ({ char, progress, range }) => {
-  const opacity = useTransform(progress, range, [0.2, 1]);
+  const opacity = useTransform(progress, range, [0.3, 1]);
 
   return (
     <span className="relative inline-block">
-      <span className="opacity-20 select-none" aria-hidden="true">
+      <span className="opacity-30 select-none" aria-hidden="true">
         {char}
       </span>
       <motion.span style={{ opacity }} className="absolute inset-0">
@@ -36,7 +36,7 @@ export const AnimatedText: React.FC<AnimatedTextProps> = ({
   const ref = useRef<HTMLParagraphElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ['start 0.8', 'end 0.2'],
+    offset: ['start 0.88', 'end 0.48'],
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
