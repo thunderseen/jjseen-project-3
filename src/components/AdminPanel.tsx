@@ -18,16 +18,19 @@ import {
   Check,
   Sparkles,
   ExternalLink,
+  Cloud,
 } from 'lucide-react';
 import {
-  ADMIN_SESSION_KEY,
   PortfolioStore,
   ProjectItem,
   ShowcaseItem,
+  clearSavedAdminToken,
   compressImageFile,
+  getSavedAdminToken,
+  loginCloudAdmin,
   normalizeUrl,
-  updateStoredPasscode,
-  verifyPasscode,
+  saveCloudPortfolio,
+  updateCloudAdminPassword,
 } from '../types/portfolio';
 
 interface AdminPanelProps {
@@ -57,16 +60,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   store,
   onUpdateStore,
 }) => {
-  const [authed, setAuthed] = useState<boolean>(() => {
-    try {
-      return sessionStorage.getItem(ADMIN_SESSION_KEY) === '1';
-    } catch {
-      return false;
-    }
-  });
-
+  const [authed, setAuthed] = useState<boolean>(() => Boolean(getSavedAdminToken()));
   const [loginPass, setLoginPass] = useState('');
   const [loginError, setLoginError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   const [tab, setTab] = useState<AdminTab>('showcase');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -86,36 +84,48 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   useEffect(() => {
     if (!statusMsg) return;
-    const t = setTimeout(() => setStatusMsg(null), 2600);
+    const t = setTimeout(() => setStatusMsg(null), 3200);
     return () => clearTimeout(t);
   }, [statusMsg]);
 
   const notify = (msg: string) => setStatusMsg(msg);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const persistToCloud = async (next: PortfolioStore, successMsg: string) => {
+    onUpdateStore(next);
+    setSyncing(true);
+    const res = await saveCloudPortfolio(next);
+    setSyncing(false);
+    if (res.unauthorized) {
+      setAuthed(false);
+      setLoginError('Session expired. Please sign in again.');
+      return;
+    }
+    if (!res.ok) {
+      notify(`Saved locally, but cloud sync failed: ${res.error}`);
+      return;
+    }
+    notify(`${successMsg} (Synced to Cloud DB ✓)`);
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (verifyPasscode(loginPass)) {
+    if (!loginPass) return;
+    setAuthLoading(true);
+    setLoginError('');
+    const res = await loginCloudAdmin(loginPass);
+    setAuthLoading(false);
+    if (res.ok) {
       setAuthed(true);
-      setLoginError('');
       setLoginPass('');
-      try {
-        sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
-      } catch {
-        // ignore
-      }
     } else {
-      setLoginError('Incorrect password. Access denied.');
+      setLoginError(res.error || 'Incorrect password. Access denied.');
     }
   };
 
   const handleLogout = () => {
     setAuthed(false);
     setLoginPass('');
-    try {
-      sessionStorage.removeItem(ADMIN_SESSION_KEY);
-    } catch {
-      // ignore
-    }
+    clearSavedAdminToken();
   };
 
   const startEdit = (p: ProjectItem) => {
@@ -161,18 +171,22 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       ? store.projects.map((p) => (p.id === editingId ? cleaned : p))
       : [...store.projects, cleaned];
 
-    onUpdateStore({ ...store, projects: nextProjects });
-    notify(editingId ? 'Project updated live!' : 'New project published live!');
+    void persistToCloud(
+      { ...store, projects: nextProjects },
+      editingId ? 'Project updated live' : 'New project published live'
+    );
     resetForm();
   };
 
   const handleDeleteProject = (id: string) => {
-    onUpdateStore({
-      ...store,
-      projects: store.projects.filter((p) => p.id !== id),
-    });
+    void persistToCloud(
+      {
+        ...store,
+        projects: store.projects.filter((p) => p.id !== id),
+      },
+      'Project removed'
+    );
     if (editingId === id) resetForm();
-    notify('Project removed.');
   };
 
   const handleMoveProject = (index: number, delta: -1 | 1) => {
@@ -181,7 +195,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const copy = [...store.projects];
     const [moved] = copy.splice(index, 1);
     copy.splice(target, 0, moved);
-    onUpdateStore({ ...store, projects: copy });
+    void persistToCloud({ ...store, projects: copy }, 'Project order updated');
   };
 
   const handleImageUpload = async (
@@ -190,7 +204,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   ) => {
     if (!file) return;
     try {
-      const dataUrl = await compressImageFile(file, 1280, 0.82);
+      const dataUrl = await compressImageFile(file, 1000, 0.78);
       setForm((prev) => ({ ...prev, [field]: dataUrl, useLivePreview: false }));
       notify('Image uploaded & optimized.');
     } catch {
@@ -200,18 +214,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const handleCvUpload = (file?: File) => {
     if (!file) return;
-    if (file.size > 4 * 1024 * 1024) {
-      notify('Please upload a PDF smaller than 4 MB.');
+    if (file.size > 3.5 * 1024 * 1024) {
+      notify('Please upload a PDF smaller than 3.5 MB.');
       return;
     }
     const reader = new FileReader();
     reader.onload = () => {
-      onUpdateStore({
-        ...store,
-        cvPdfDataUrl: reader.result as string,
-        cvPdfName: file.name,
-      });
-      notify(`Uploaded ${file.name} for CV download!`);
+      void persistToCloud(
+        {
+          ...store,
+          cvPdfDataUrl: reader.result as string,
+          cvPdfName: file.name,
+        },
+        `Uploaded ${file.name}`
+      );
     };
     reader.readAsDataURL(file);
   };
@@ -232,7 +248,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleShowcaseImageUpload = async (file?: File) => {
     if (!file) return;
     try {
-      const dataUrl = await compressImageFile(file, 1000, 0.82);
+      const dataUrl = await compressImageFile(file, 900, 0.78);
       setShowcaseForm((prev) => ({ ...prev, imageUrl: dataUrl }));
       notify('Showcase image uploaded & optimized.');
     } catch {
@@ -253,25 +269,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       linkUrl: showcaseForm.linkUrl.trim() ? normalizeUrl(showcaseForm.linkUrl) : undefined,
       row: showcaseForm.row,
     };
-    onUpdateStore({
-      ...store,
-      showcaseItems: [...store.showcaseItems, nextItem],
-    });
+    void persistToCloud(
+      {
+        ...store,
+        showcaseItems: [...store.showcaseItems, nextItem],
+      },
+      'Added to Hero Showcase Strip'
+    );
     setShowcaseForm({
       title: '',
       imageUrl: '',
       linkUrl: '',
       row: showcaseForm.row === 1 ? 2 : 1,
     });
-    notify('Added to Hero Showcase Strip!');
   };
 
   const handleDeleteShowcase = (id: string) => {
-    onUpdateStore({
-      ...store,
-      showcaseItems: store.showcaseItems.filter((item) => item.id !== id),
-    });
-    notify('Removed from Showcase Strip.');
+    void persistToCloud(
+      {
+        ...store,
+        showcaseItems: store.showcaseItems.filter((item) => item.id !== id),
+      },
+      'Removed from Showcase Strip'
+    );
   };
 
   const handleImportJson = (file?: File) => {
@@ -281,15 +301,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       try {
         const parsed = JSON.parse(reader.result as string) as Partial<PortfolioStore>;
         if (!Array.isArray(parsed.projects)) throw new Error('Invalid');
-        onUpdateStore({
-          projects: parsed.projects,
-          showcaseItems: Array.isArray(parsed.showcaseItems)
-            ? parsed.showcaseItems
-            : store.showcaseItems,
-          cvPdfDataUrl: parsed.cvPdfDataUrl ?? store.cvPdfDataUrl,
-          cvPdfName: parsed.cvPdfName ?? store.cvPdfName,
-        });
-        notify('Backup imported successfully!');
+        void persistToCloud(
+          {
+            projects: parsed.projects,
+            showcaseItems: Array.isArray(parsed.showcaseItems)
+              ? parsed.showcaseItems
+              : store.showcaseItems,
+            cvPdfDataUrl: parsed.cvPdfDataUrl ?? store.cvPdfDataUrl,
+            cvPdfName: parsed.cvPdfName ?? store.cvPdfName,
+          },
+          'Backup imported'
+        );
       } catch {
         notify('Invalid backup JSON file.');
       }
@@ -297,20 +319,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     reader.readAsText(file);
   };
 
-  const handleSaveCredentials = (e: React.FormEvent) => {
+  const handleSaveCredentials = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!verifyPasscode(currentPassword)) {
-      notify('Current password is incorrect.');
-      return;
-    }
     if (newPassword.length < 4) {
       notify('New password must be at least 4 characters.');
       return;
     }
-    updateStoredPasscode(newPassword);
+    setSyncing(true);
+    const res = await updateCloudAdminPassword(currentPassword, newPassword);
+    setSyncing(false);
+    if (res.unauthorized) {
+      setAuthed(false);
+      setLoginError('Session expired. Please sign in again.');
+      return;
+    }
+    if (!res.ok) {
+      notify(res.error || 'Could not update password.');
+      return;
+    }
     setCurrentPassword('');
     setNewPassword('');
-    notify('Admin password updated!');
+    notify('Admin password updated across all devices! ✓');
   };
 
   return (
@@ -341,8 +370,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   <h2 className="text-base sm:text-lg font-bold uppercase tracking-wider text-white">
                     Jayed Portfolio Admin
                   </h2>
-                  <p className="text-[11px] uppercase tracking-widest text-[#D7E2EA]/50">
-                    {authed ? 'Live Content Manager' : 'Protected Login'}
+                  <p className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-[#D7E2EA]/55">
+                    <Cloud className="h-3 w-3 text-emerald-400" />
+                    {syncing
+                      ? 'Syncing to Cloudflare D1...'
+                      : authed
+                      ? 'Cloud Synced • All Devices'
+                      : 'Protected Cloud Login'}
                   </p>
                 </div>
               </div>
@@ -423,13 +457,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
                 <button
                   type="submit"
-                  className="mt-2 w-full rounded-full py-3 text-sm font-semibold uppercase tracking-widest text-white transition-all hover:brightness-110"
+                  disabled={authLoading}
+                  className="mt-2 w-full rounded-full py-3 text-sm font-semibold uppercase tracking-widest text-white transition-all hover:brightness-110 disabled:opacity-60"
                   style={{
                     background:
                       'linear-gradient(123deg, #5B5FE8 0%, #8B7CFF 50%, #67C5FF 100%)',
                   }}
                 >
-                  Unlock Panel
+                  {authLoading ? 'Verifying...' : 'Unlock Panel'}
                 </button>
               </form>
             ) : (
@@ -473,8 +508,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        onUpdateStore({ ...store, showcaseItems: [] });
-                        notify('Showcase Strip cleared to empty slots.');
+                        void persistToCloud(
+                          { ...store, showcaseItems: [] },
+                          'Showcase Strip cleared'
+                        );
                       }}
                       className="inline-flex items-center gap-1.5 rounded-full border border-rose-400/30 bg-rose-500/10 px-3.5 py-1.5 text-xs uppercase tracking-wider text-rose-300 hover:bg-rose-500/20"
                     >
@@ -487,9 +524,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        onUpdateStore({ ...store, projects: [] });
+                        void persistToCloud(
+                          { ...store, projects: [] },
+                          'All project slots cleared'
+                        );
                         resetForm();
-                        notify('All project slots cleared.');
                       }}
                       className="inline-flex items-center gap-1.5 rounded-full border border-rose-400/30 bg-rose-500/10 px-3.5 py-1.5 text-xs uppercase tracking-wider text-rose-300 hover:bg-rose-500/20"
                     >
@@ -957,12 +996,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         <button
                           type="button"
                           onClick={() => {
-                            onUpdateStore({
-                              ...store,
-                              cvPdfDataUrl: null,
-                              cvPdfName: null,
-                            });
-                            notify('Reverted to built-in printable CV.');
+                            void persistToCloud(
+                              {
+                                ...store,
+                                cvPdfDataUrl: null,
+                                cvPdfName: null,
+                              },
+                              'Reverted to built-in printable CV'
+                            );
                           }}
                           className="rounded-full border border-rose-400/35 px-4 py-2.5 text-xs uppercase tracking-widest text-rose-300 hover:bg-rose-500/15"
                         >
@@ -1026,7 +1067,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         Backup &amp; Portable Sync
                       </h3>
                       <p className="text-xs leading-relaxed text-[#D7E2EA]/65">
-                        Changes save instantly in this browser. Export a JSON backup anytime to transfer your projects across devices or seed a live deployment.
+                        Every update automatically syncs to your Cloudflare D1 Cloud Database so visitors on any device see changes immediately. You can also export or import JSON backups anytime.
                       </p>
                       <div className="flex flex-wrap gap-3">
                         <button

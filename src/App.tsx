@@ -9,7 +9,12 @@ import { CvSection } from './sections/CvSection';
 import { ContactModal } from './components/ContactModal';
 import { AdminPanel } from './components/AdminPanel';
 import { CursorCompanion } from './components/CursorCompanion';
-import { PortfolioStore, loadStore, saveStore } from './types/portfolio';
+import {
+  PortfolioStore,
+  fetchCloudPortfolio,
+  loadStore,
+  saveStore,
+} from './types/portfolio';
 
 export function App() {
   const [contactOpen, setContactOpen] = useState(false);
@@ -21,6 +26,19 @@ export function App() {
     damping: 28,
     restDelta: 0.001,
   });
+
+  // Sync live portfolio data from Cloudflare D1 backend so updates from any device appear globally
+  useEffect(() => {
+    let active = true;
+    fetchCloudPortfolio().then((cloud) => {
+      if (active && cloud) {
+        setStore(cloud);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleUpdateStore = (next: PortfolioStore) => {
     setStore(next);

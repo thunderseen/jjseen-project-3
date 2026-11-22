@@ -27,43 +27,18 @@ export interface PortfolioStore {
 }
 
 export const STORAGE_KEY = 'jayed_portfolio_store_v1';
-export const ADMIN_PASS_KEY = 'jayed_portfolio_admin_pass_v2';
-export const ADMIN_SESSION_KEY = 'jayed_portfolio_admin_session_v2';
+export const ADMIN_TOKEN_KEY = 'jayed_portfolio_admin_token_v3';
 
-// Lightweight deterministic hash so the passcode is not stored in plaintext in localStorage
-export function hashPasscode(input: string): string {
-  const salted = `jjs::v2::${input}`;
-  let h1 = 0xdeadbeef ^ salted.length;
-  let h2 = 0x41c6ce57 ^ salted.length;
-  for (let i = 0; i < salted.length; i++) {
-    const ch = salted.charCodeAt(i);
-    h1 = Math.imul(h1 ^ ch, 2654435761);
-    h2 = Math.imul(h2 ^ ch, 1597334677);
+export const CLOUD_API_ORIGIN = 'https://jayed-portfolio.pages.dev';
+
+export function getApiBase(): string {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'jayed-portfolio.pages.dev' || host.endsWith('.jayed-portfolio.pages.dev')) {
+      return '/api';
+    }
   }
-  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
-}
-
-export function verifyPasscode(candidate: string): boolean {
-  const stored = getStoredPasscodeHash();
-  return hashPasscode(candidate) === stored;
-}
-
-export function getStoredPasscodeHash(): string {
-  try {
-    return localStorage.getItem(ADMIN_PASS_KEY) || hashPasscode('sabasagol');
-  } catch {
-    return hashPasscode('sabasagol');
-  }
-}
-
-export function updateStoredPasscode(newPasscode: string): void {
-  try {
-    localStorage.setItem(ADMIN_PASS_KEY, hashPasscode(newPasscode));
-  } catch {
-    // ignore storage quota errors
-  }
+  return `${CLOUD_API_ORIGIN}/api`;
 }
 
 export const DEFAULT_PROJECTS: ProjectItem[] = [
@@ -153,6 +128,133 @@ export function saveStore(store: PortfolioStore): boolean {
   }
 }
 
+export async function fetchCloudPortfolio(): Promise<PortfolioStore | null> {
+  try {
+    const res = await fetch(`${getApiBase()}/portfolio`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = (await res.json()) as Partial<PortfolioStore>;
+    const normalized: PortfolioStore = {
+      projects: Array.isArray(data.projects) ? data.projects : DEFAULT_PROJECTS,
+      showcaseItems: Array.isArray(data.showcaseItems) ? data.showcaseItems : [],
+      cvPdfDataUrl: typeof data.cvPdfDataUrl === 'string' && data.cvPdfDataUrl ? data.cvPdfDataUrl : null,
+      cvPdfName: typeof data.cvPdfName === 'string' && data.cvPdfName ? data.cvPdfName : null,
+    };
+    saveStore(normalized);
+    return normalized;
+  } catch {
+    return null;
+  }
+}
+
+export async function loginCloudAdmin(
+  password: string
+): Promise<{ ok: boolean; token?: string; error?: string }> {
+  try {
+    const res = await fetch(`${getApiBase()}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok || !data.token) {
+      return { ok: false, error: data.error || 'Incorrect password.' };
+    }
+    try {
+      sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+    } catch {
+      // ignore storage errors
+    }
+    return { ok: true, token: data.token };
+  } catch {
+    return { ok: false, error: 'Could not connect to cloud server. Check your internet connection.' };
+  }
+}
+
+export function getSavedAdminToken(): string | null {
+  try {
+    return sessionStorage.getItem(ADMIN_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function clearSavedAdminToken(): void {
+  try {
+    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+export async function saveCloudPortfolio(
+  store: PortfolioStore
+): Promise<{ ok: boolean; error?: string; unauthorized?: boolean }> {
+  const token = getSavedAdminToken();
+  if (!token) {
+    return { ok: false, unauthorized: true, error: 'Please sign in again.' };
+  }
+  try {
+    const res = await fetch(`${getApiBase()}/admin/save`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(store),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401) {
+      clearSavedAdminToken();
+      return { ok: false, unauthorized: true, error: data.error || 'Session expired.' };
+    }
+    if (!res.ok || !data.ok) {
+      return { ok: false, error: data.error || 'Cloud save failed.' };
+    }
+    saveStore(store);
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'Network error while saving to cloud.' };
+  }
+}
+
+export async function updateCloudAdminPassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<{ ok: boolean; error?: string; unauthorized?: boolean }> {
+  const token = getSavedAdminToken();
+  if (!token) {
+    return { ok: false, unauthorized: true, error: 'Please sign in again.' };
+  }
+  try {
+    const res = await fetch(`${getApiBase()}/admin/password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401) {
+      clearSavedAdminToken();
+      return { ok: false, unauthorized: true, error: data.error || 'Session expired.' };
+    }
+    if (!res.ok || !data.ok) {
+      return { ok: false, error: data.error || 'Could not update password.' };
+    }
+    if (data.token) {
+      try {
+        sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+      } catch {
+        // ignore
+      }
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'Network error while updating password.' };
+  }
+}
+
 export function normalizeUrl(url: string): string {
   const trimmed = url.trim();
   if (!trimmed) return '';
@@ -160,7 +262,7 @@ export function normalizeUrl(url: string): string {
   return `https://${trimmed}`;
 }
 
-export function compressImageFile(file: File, maxDim = 1200, quality = 0.82): Promise<string> {
+export function compressImageFile(file: File, maxDim = 1000, quality = 0.78): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error('Failed to read image file'));

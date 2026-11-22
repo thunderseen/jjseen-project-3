@@ -1,0 +1,9 @@
+name = "jayed-portfolio"
+compatibility_date = "2026-11-22"
+pages_build_output_dir = "dist"
+
+# Permanent Free Cloud SQL Database (Cloudflare D1 — APAC/Singapore Region)
+[[d1_databases]]
+binding = "DB"
+database_name = "jayed-portfolio-db"
+database_id = "f46d0d81-2c96-43ff-8394-4922285e12e8"
