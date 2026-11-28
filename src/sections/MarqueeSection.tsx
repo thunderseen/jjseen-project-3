@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
-import { ProjectItem, ShowcaseItem, normalizeUrl } from '../types/portfolio';
+import { ProjectItem, ShowcaseItem, normalizeUrl, resolveAssetUrl } from '../types/portfolio';
 
 interface MarqueeSectionProps {
   items: ShowcaseItem[];
@@ -103,9 +103,12 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ items, projects 
               Interactive Deck Below ↓
             </a>
           </div>
-          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {featuredProjects.map((project, index) => {
               const href = normalizeUrl(project.href);
+              const thumb = resolveAssetUrl(
+                project.previewImage || project.col2Img || project.col1Img1
+              );
               return (
                 <a
                   key={project.id}
@@ -113,25 +116,47 @@ export const MarqueeSection: React.FC<MarqueeSectionProps> = ({ items, projects 
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`View ${project.name}`}
-                  className="group flex min-h-[112px] flex-col justify-between rounded-2xl border border-[#D7E2EA]/12 bg-gradient-to-br from-[#161925] to-[#0E1016] p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#8B7CFF]/60 hover:shadow-[0_8px_22px_rgba(139,124,255,0.14)]"
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-[#D7E2EA]/14 bg-[#11131B] transition-all duration-200 hover:-translate-y-1 hover:border-[#8B7CFF]/65 hover:shadow-[0_12px_28px_rgba(139,124,255,0.16)]"
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-black leading-none text-[#D7E2EA]/35">
+                  {/* Crisp Website Screenshot Thumbnail */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#0B0C10]">
+                    {thumb ? (
+                      <img
+                        src={thumb}
+                        alt={`${project.name} live website preview`}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.04]"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#191D2D] to-[#0E1016] text-xs uppercase tracking-widest text-[#D7E2EA]/40">
+                        Live Site
+                      </div>
+                    )}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#11131B] to-transparent" />
+                    <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-emerald-300 backdrop-blur-sm border border-emerald-400/25">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      Live
+                    </span>
+                    <span className="absolute right-2.5 top-2.5 rounded-full bg-black/65 px-2 py-0.5 text-[10px] font-bold text-[#D7E2EA]/80 backdrop-blur-sm">
                       {String(index + 1).padStart(2, '0')}
                     </span>
-                    <span className="inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.08em] text-[#BBCCD7]/70 truncate">
-                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
+                  </div>
+
+                  {/* Card Footer Info */}
+                  <div className="flex flex-1 flex-col justify-between gap-1.5 px-3.5 pb-3.5 pt-2">
+                    <span className="truncate text-[10px] font-medium uppercase tracking-[0.1em] text-[#BBCCD7]/65">
                       {project.category.split('•')[0].trim()}
                     </span>
-                  </div>
-                  <div className="mt-4 flex items-end justify-between gap-2">
-                    <h3 className="text-sm font-semibold uppercase leading-snug tracking-wide text-[#D7E2EA] group-hover:text-white transition-colors">
-                      {project.name}
-                    </h3>
-                    <ArrowUpRight
-                      aria-hidden="true"
-                      className="h-4 w-4 shrink-0 text-[#8B7CFF] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    />
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="truncate text-sm font-semibold uppercase tracking-wide text-[#D7E2EA] group-hover:text-white transition-colors">
+                        {project.name}
+                      </h3>
+                      <ArrowUpRight
+                        aria-hidden="true"
+                        className="h-4 w-4 shrink-0 text-[#8B7CFF] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                    </div>
                   </div>
                 </a>
               );

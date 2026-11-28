@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 import { ExternalLink, Globe, Play, RefreshCw, X } from 'lucide-react';
 import { FadeIn } from '../components/FadeIn';
 import { LiveProjectButton } from '../components/LiveProjectButton';
-import { ProjectItem, normalizeUrl } from '../types/portfolio';
+import { ProjectItem, normalizeUrl, resolveAssetUrl } from '../types/portfolio';
 
 function getPreviewSandbox(url: string): string {
   try {
@@ -52,6 +52,7 @@ const StickyProjectCard: React.FC<StickyCardProps> = ({
   const cleanHost = liveUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
   const previewSandbox = getPreviewSandbox(liveUrl);
   const customImages = [project.col1Img1, project.col1Img2, project.col2Img].filter(Boolean);
+  const previewShot = resolveAssetUrl(project.previewImage);
   const accent = ACCENT_GRADIENTS[index % ACCENT_GRADIENTS.length];
   const stackOffset = Math.min(index, 8) * 9;
 
@@ -226,46 +227,94 @@ const StickyProjectCard: React.FC<StickyCardProps> = ({
                 />
               </div>
             ) : (
-              /* Zero-lag Instant Native Preview Surface (keeps scrolling 120fps) */
-              <div
-                className={`relative flex min-h-[175px] sm:min-h-[195px] flex-col justify-between bg-gradient-to-br ${accent} p-4 sm:p-6`}
-              >
-                <div className="flex flex-col gap-2">
-                  {project.description && (
-                    <p className="max-w-2xl text-xs sm:text-sm font-light leading-relaxed text-[#D7E2EA]/85">
-                      {project.description}
-                    </p>
-                  )}
-                  {project.tags && project.tags.length > 0 && (
-                    <div className="mt-1 flex flex-wrap gap-1.5">
-                      {project.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full border border-white/15 bg-black/25 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-[#D7E2EA]/80"
-                        >
-                          {tag}
-                        </span>
-                      ))}
+              /* Zero-lag Instant Visual Preview (Real Screenshot + Info Overlay) */
+              <div className={`relative bg-gradient-to-br ${accent}`}>
+                {previewShot ? (
+                  <div className="relative h-[220px] sm:h-[270px] md:h-[310px] w-full overflow-hidden bg-[#0B0C10]">
+                    <img
+                      src={previewShot}
+                      alt={`${project.name} live website screenshot`}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover object-top"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0B0C10] via-[#0B0C10]/85 to-transparent px-4 pb-3.5 pt-12 sm:px-5">
+                      <div className="flex flex-wrap items-end justify-between gap-3">
+                        <div className="min-w-0 max-w-2xl">
+                          {project.description && (
+                            <p className="text-xs sm:text-[13px] font-light leading-snug text-[#D7E2EA]/90 line-clamp-2">
+                              {project.description}
+                            </p>
+                          )}
+                          {project.tags && project.tags.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              {project.tags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="rounded-full border border-white/15 bg-black/50 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-[#D7E2EA]/85 backdrop-blur-sm"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {liveUrl && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIframeLoaded(false);
+                              setPreviewOpen(true);
+                            }}
+                            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#8B7CFF]/60 bg-[#8B7CFF]/20 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-widest text-white backdrop-blur-sm hover:bg-[#8B7CFF]/35 transition-colors"
+                          >
+                            <Play className="h-3 w-3 fill-current" />
+                            Interact Live
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <div className="flex min-h-[175px] sm:min-h-[195px] flex-col justify-between p-4 sm:p-6">
+                    <div className="flex flex-col gap-2">
+                      {project.description && (
+                        <p className="max-w-2xl text-xs sm:text-sm font-light leading-relaxed text-[#D7E2EA]/85">
+                          {project.description}
+                        </p>
+                      )}
+                      {project.tags && project.tags.length > 0 && (
+                        <div className="mt-1 flex flex-wrap gap-1.5">
+                          {project.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="rounded-full border border-white/15 bg-black/25 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-[#D7E2EA]/80"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
 
-                <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-3">
-                  <span className="text-[11px] font-light text-[#BBCCD7]/70">
-                    Click <strong className="font-medium text-white">Live Preview</strong> to test interactively right here without slowing scroll
-                  </span>
-                  {liveUrl && (
-                    <a
-                      href={liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-widest text-[#67C5FF] hover:text-white transition-colors"
-                    >
-                      Launch Fullscreen
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
-                  )}
-                </div>
+                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-3">
+                      <span className="text-[11px] font-light text-[#BBCCD7]/70">
+                        Click <strong className="font-medium text-white">Live Preview</strong> to test interactively right here
+                      </span>
+                      {liveUrl && (
+                        <a
+                          href={liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-widest text-[#67C5FF] hover:text-white transition-colors"
+                        >
+                          Launch Fullscreen
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

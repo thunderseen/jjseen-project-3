@@ -4,11 +4,18 @@ export interface ProjectItem {
   name: string;
   description?: string;
   href: string;
+  previewImage?: string;
   useLivePreview: boolean;
   col1Img1: string;
   col1Img2: string;
   col2Img: string;
   tags?: string[];
+}
+
+export function resolveAssetUrl(src?: string): string {
+  if (!src) return '';
+  if (/^(https?:|data:|blob:|\/)/i.test(src)) return src;
+  return `${import.meta.env.BASE_URL}${src.replace(/^\.\//, '')}`;
 }
 
 export interface ShowcaseItem {
@@ -49,6 +56,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'Luxury spatial virtual T-shirt storefront with sculptural mannequins, real-time try-on, bKash/Nagad/COD checkout, and Cloudflare D1 backend.',
     href: 'https://seen-studio-store.pages.dev/',
+    previewImage: 'previews/seen-studio-store.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -62,6 +70,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'Pure organic foods, safe groceries, and daily wellness online storefront engineered for fast mobile shopping across Bangladesh.',
     href: 'https://seen-bazar.pages.dev/',
+    previewImage: 'previews/seen-bazar.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -75,6 +84,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'Interactive fast-food & combo ordering platform featuring burgers, golden fries, cheesy pizzas, rice bowls, oven pasta, momos, and waffles.',
     href: 'https://seen-bites.pages.dev/',
+    previewImage: 'previews/seen-bites.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -88,6 +98,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'All-in-one digital advertising agency site with Meta, Google, YouTube, TikTok & LinkedIn Ads pricing and an interactive budget calculator.',
     href: 'https://seen-services.pages.dev/',
+    previewImage: 'previews/seen-services.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -101,6 +112,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'Full-stack web, WooCommerce, cloud app, technical SEO, and AI workflow studio featuring a 60-second site audit and project estimator.',
     href: 'https://seen-studio.pages.dev/',
+    previewImage: 'previews/seen-studio-hub.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -114,6 +126,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'Interactive multi-site live website preview and client order studio showcasing published web apps and e-commerce builds.',
     href: 'https://seen-showcase.pages.dev/',
+    previewImage: 'previews/seen-showcase.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -127,6 +140,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'Official bilingual (Bangla & English) Trainee ID Card Registration Portal & CR80 Print Studio built for DYD & e-Learning & Earning Ltd.',
     href: 'https://student-id-portal.pages.dev/',
+    previewImage: 'previews/student-id-portal.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -140,6 +154,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'Spatial 3D web designer and WordPress developer portfolio featuring interactive demos and real-time motion styling.',
     href: 'https://jayed-jaman-seen.pages.dev/',
+    previewImage: 'previews/jayed-3d-portfolio.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -153,6 +168,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'Modern digital banking and personal finance vault web application deployed live on Vercel.',
     href: 'https://seenvault.vercel.app/',
+    previewImage: 'previews/seenvault-banking.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -166,6 +182,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'High-speed corporate website concept for an architecture and construction brand with Rank Math SEO structure.',
     href: 'https://jjseen.pages.dev/demos/apex-agency.html',
+    previewImage: 'previews/apex-architecture-demo.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -179,6 +196,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'Conversion-focused specialty coffee storefront concept with filterable catalog and interactive slide-out cart UX.',
     href: 'https://jjseen.pages.dev/demos/velora-store.html',
+    previewImage: 'previews/velora-storefront-demo.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
@@ -192,6 +210,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     description:
       'Interactive SEO audit and B2B/B2C lead-generation dashboard for keyword discovery and prospect intelligence.',
     href: 'https://jjseen.pages.dev/demos/pulse-ai-seo.html',
+    previewImage: 'previews/pulserank-seo-demo.webp',
     useLivePreview: true,
     col1Img1: '',
     col1Img2: '',
