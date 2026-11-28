@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { FadeIn } from './FadeIn';
 
-const PORTRAIT_SRC = `${import.meta.env.BASE_URL}jayed-portrait.png`;
+const PORTRAIT_SRC = `${import.meta.env.BASE_URL}jayed-portrait.webp`;
 
 export const LivingPortrait: React.FC = () => {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -31,7 +31,7 @@ export const LivingPortrait: React.FC = () => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const OVER = 1.7;
-    const N = 72;
+    const N = 40;
     const M = N + 1;
     const SPAN = OVER / N;
     const ORIGIN = 0.5 - OVER / 2;
@@ -717,12 +717,14 @@ export const LivingPortrait: React.FC = () => {
     img.onload = () => {
       if (disposed) return;
       uploadTexture(img);
-      buildHitMap(img);
       fallback.style.visibility = 'hidden';
       resizeCanvas();
       ready = true;
       tStart = performance.now();
       rafId = requestAnimationFrame(frame);
+      setTimeout(() => {
+        if (!disposed) buildHitMap(img);
+      }, 60);
     };
     img.src = PORTRAIT_SRC;
 
@@ -745,7 +747,7 @@ export const LivingPortrait: React.FC = () => {
 
   return (
     <div className="hero-portrait-wrap" id="magnetWrap" ref={wrapRef}>
-      <FadeIn delay={0.6} y={30} className="hero-portrait-inner" style={{ position: 'relative' }}>
+      <FadeIn delay={0.08} duration={0.4} y={14} className="hero-portrait-inner" style={{ position: 'relative' }}>
         <img
           ref={fallbackRef}
           id="faceFallback"

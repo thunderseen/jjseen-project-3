@@ -25,7 +25,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
         className="pointer-events-none absolute top-[6%] left-[2%] sm:left-[4%] md:left-[6%] w-[82px] sm:w-[110px] md:w-[142px] select-none opacity-90"
       >
         <img
-          src={`${import.meta.env.BASE_URL}moon-icon.png`}
+          src={`${import.meta.env.BASE_URL}moon-icon.webp`}
           alt=""
           aria-hidden="true"
           loading="lazy"
@@ -36,14 +36,14 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
 
       {/* Bottom-left decorative 3D object */}
       <FadeIn
-        delay={0.25}
-        x={-60}
+        delay={0.18}
+        x={-40}
         y={0}
-        duration={0.85}
+        duration={0.5}
         className="pointer-events-none absolute bottom-[8%] left-[4%] sm:left-[7%] md:left-[11%] w-[72px] sm:w-[96px] md:w-[126px] select-none opacity-90"
       >
         <img
-          src={`${import.meta.env.BASE_URL}about-object.png`}
+          src={`${import.meta.env.BASE_URL}about-object.webp`}
           alt=""
           aria-hidden="true"
           loading="lazy"
@@ -54,14 +54,14 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
 
       {/* Top-right decorative 3D Lego */}
       <FadeIn
-        delay={0.15}
-        x={60}
+        delay={0.12}
+        x={40}
         y={0}
-        duration={0.85}
+        duration={0.5}
         className="pointer-events-none absolute top-[6%] right-[2%] sm:right-[4%] md:right-[6%] w-[82px] sm:w-[110px] md:w-[142px] select-none opacity-90"
       >
         <img
-          src={`${import.meta.env.BASE_URL}lego-icon.png`}
+          src={`${import.meta.env.BASE_URL}lego-icon.webp`}
           alt=""
           aria-hidden="true"
           loading="lazy"
@@ -72,14 +72,14 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenContact }) => 
 
       {/* Bottom-right decorative 3D group */}
       <FadeIn
-        delay={0.3}
-        x={60}
+        delay={0.22}
+        x={40}
         y={0}
-        duration={0.85}
+        duration={0.5}
         className="pointer-events-none absolute bottom-[8%] right-[4%] sm:right-[7%] md:right-[11%] w-[88px] sm:w-[116px] md:w-[148px] select-none opacity-90"
       >
         <img
-          src={`${import.meta.env.BASE_URL}about-group.png`}
+          src={`${import.meta.env.BASE_URL}about-group.webp`}
           alt=""
           aria-hidden="true"
           loading="lazy"

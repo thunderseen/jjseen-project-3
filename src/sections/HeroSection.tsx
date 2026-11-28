@@ -57,7 +57,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact }) => {
         </FadeIn>
 
         <div className="w-full overflow-hidden px-4 sm:px-6">
-          <FadeIn as="div" delay={0.15} y={32}>
+          <FadeIn as="div" delay={0.04} duration={0.38} y={18}>
             <h1
               id="hero-heading"
               className="hero-heading mt-8 sm:mt-6 md:mt-5 w-full select-none whitespace-nowrap text-center text-[clamp(2.65rem,9.8vw,8.25rem)] font-black leading-none tracking-tight"
@@ -73,7 +73,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact }) => {
 
       {/* Bottom Bar */}
       <div className="relative z-20 mx-auto flex w-full max-w-6xl flex-col items-start gap-4 px-6 pb-6 sm:flex-row sm:items-end sm:justify-between sm:gap-0 sm:pb-8 md:px-10 md:pb-9">
-        <FadeIn delay={0.35} y={20}>
+        <FadeIn delay={0.1} duration={0.38} y={14}>
           <p
             className="max-w-[200px] sm:max-w-[240px] md:max-w-[270px] font-light uppercase leading-snug tracking-wide text-[#D7E2EA]/90"
             style={{ fontSize: 'clamp(0.72rem, 1.05vw, 0.98rem)' }}
@@ -83,7 +83,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenContact }) => {
           </p>
         </FadeIn>
 
-        <FadeIn delay={0.5} y={20}>
+        <FadeIn delay={0.14} duration={0.38} y={14}>
           <ContactButton onClick={onOpenContact} />
         </FadeIn>
       </div>

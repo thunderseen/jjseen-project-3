@@ -243,7 +243,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ open, onClose }) => 
                 GitHub
               </a>
               <a
-                href="https://student-id-portal-1.onrender.com"
+                href="https://student-id-portal.pages.dev/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-[#D7E2EA]/35 px-4 py-2 text-xs uppercase tracking-widest hover:bg-[#D7E2EA]/10 transition-colors"

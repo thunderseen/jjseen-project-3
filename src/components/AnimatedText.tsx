@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useSpring, useTransform, MotionValue } from 'framer-motion';
+import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
 
 interface AnimatedCharProps {
   char: string;
@@ -8,7 +8,7 @@ interface AnimatedCharProps {
 }
 
 const AnimatedChar: React.FC<AnimatedCharProps> = ({ char, progress, range }) => {
-  const opacity = useTransform(progress, range, [0.3, 1]);
+  const opacity = useTransform(progress, range, [0.32, 1]);
 
   return (
     <span className="relative inline-block">
@@ -39,45 +39,36 @@ export const AnimatedText: React.FC<AnimatedTextProps> = ({
     offset: ['start 0.88', 'end 0.48'],
   });
 
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 110,
-    damping: 26,
-    mass: 0.25,
-  });
-
   const words = text.split(' ');
   const totalChars = text.length;
   let charIndex = 0;
 
   return (
     <p ref={ref} className={className} style={style}>
-      <span className="sr-only">{text}</span>
-      <span aria-hidden="true">
-        {words.map((word, wIdx) => {
-          const wordStart = charIndex;
-          const chars = word.split('');
-          charIndex += chars.length + 1;
+      {words.map((word, wIdx) => {
+        const wordStart = charIndex;
+        const chars = word.split('');
+        charIndex += chars.length + 1;
 
-          return (
-            <span key={wIdx} className="inline-block whitespace-nowrap">
-              {chars.map((char, cIdx) => {
-                const globalIdx = wordStart + cIdx;
-                const start = globalIdx / totalChars;
-                const end = Math.min(1, (globalIdx + 1) / totalChars);
-                return (
-                  <AnimatedChar
-                    key={`${wIdx}-${cIdx}`}
-                    char={char}
-                    progress={smoothProgress}
-                    range={[start, end]}
-                  />
-                );
-              })}
-              {wIdx < words.length - 1 ? '\u00A0' : ''}
-            </span>
-          );
-        })}
-      </span>
+        return (
+          <span key={wIdx} className="inline-block whitespace-nowrap">
+            {chars.map((char, cIdx) => {
+              const globalIdx = wordStart + cIdx;
+              const start = globalIdx / totalChars;
+              const end = Math.min(1, (globalIdx + 1) / totalChars);
+              return (
+                <AnimatedChar
+                  key={`${wIdx}-${cIdx}`}
+                  char={char}
+                  progress={scrollYProgress}
+                  range={[start, end]}
+                />
+              );
+            })}
+            {wIdx < words.length - 1 ? '\u00A0' : ''}
+          </span>
+        );
+      })}
     </p>
   );
 };

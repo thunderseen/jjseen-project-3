@@ -236,7 +236,7 @@ export const CvSection: React.FC<CvSectionProps> = ({
                         </li>
                         <li className="flex items-start gap-2">
                           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#8B7CFF]" />
-                          Built &amp; deployed live Student ID Card Portal on Render.
+                          Built &amp; deployed 12+ live cloud apps &amp; stores (SEEN Studio, SEEN Bazar, SEEN Bites, Student ID Portal) on Cloudflare Pages &amp; D1.
                         </li>
                       </ul>
                     </div>
@@ -497,7 +497,7 @@ export const CvSection: React.FC<CvSectionProps> = ({
                 GitHub
               </a>
               <a
-                href="https://student-id-portal-1.onrender.com"
+                href="https://student-id-portal.pages.dev/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-[#D7E2EA]/25 px-4 py-2 text-xs uppercase tracking-widest hover:bg-[#D7E2EA]/10 transition-colors"
@@ -589,7 +589,7 @@ export const CvSection: React.FC<CvSectionProps> = ({
                     <br />
                     fiverr.com/jayedjaman_seen | freelancer.com.bd/u/jayedjamans | x.com/JayedJamanSeen
                     <br />
-                    linkedin.com/in/jayed-jaman-seen-b540b8334 | github.com/JJSEEN | student-id-portal-1.onrender.com
+                    linkedin.com/in/jayed-jaman-seen-b540b8334 | github.com/JJSEEN | jayed-portfolio.pages.dev | student-id-portal.pages.dev
                   </p>
                 </header>
 
